@@ -2,5 +2,5 @@
 
 ## Projects
 - [ ] Wave Function Collapse
-- [ ] Discrete Cellular Automata
+- [X] Discrete Cellular Automata
 - [ ] Smooth-Life Cellular Automata

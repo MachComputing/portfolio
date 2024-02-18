@@ -11,22 +11,23 @@ export default function Home() {
   return (
     <main className="mx-32">
       <Grid>
-        <GridItem>
-          <GridItemHeader>Hello 1</GridItemHeader>
-          <GridItemImage href="/next.svg" alt="Project picture" />
-          <GridItemDescription>Test</GridItemDescription>
-        </GridItem>
-        <GridItem>
-          <GridItemHeader>Hello 2</GridItemHeader>
-        </GridItem>
-        <GridItem>
-          <GridItemHeader>Hello 3</GridItemHeader>
-        </GridItem>
-        <GridItem>
-          <GridItemHeader>Hello 4</GridItemHeader>
-        </GridItem>
-        <GridItem>
-          <GridItemHeader>Hello 5</GridItemHeader>
+        <GridItem href="/discrete-ca">
+          <GridItemHeader>Discrete Cellular Automata</GridItemHeader>
+          <GridItemImage href="/DiscreteCA.png" alt="Project picture" />
+          <GridItemDescription>
+            <p>
+              Discrete Cellular Automata, as the name implies, is a discrete
+              model of computation.
+            </p>
+            <p>
+              It consists in a grid of cells that can be in one of two states,
+              on or off. The state of a cell is determined by the state of its
+              neighbors.
+            </p>
+            <p>
+              This project is a simple implementation of a 2D cellular automata.
+            </p>
+          </GridItemDescription>
         </GridItem>
       </Grid>
     </main>
