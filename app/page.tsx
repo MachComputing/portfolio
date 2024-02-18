@@ -9,7 +9,7 @@ import React from "react";
 
 export default function Home() {
   return (
-    <main className="mx-32">
+    <main className="mx-2 md:mx-32">
       <Grid>
         <GridItem href="/discrete-ca">
           <GridItemHeader>Discrete Cellular Automata</GridItemHeader>
