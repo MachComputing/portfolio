@@ -60,6 +60,13 @@ export default function DiscreteCA() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      if (ctx) {
+        requestAnimationFrame(update);
+      }
       window.addEventListener("resize", () => {
         const canvas = canvasRef.current;
         if (canvas) {
@@ -69,16 +76,8 @@ export default function DiscreteCA() {
           update();
         }
       });
-
-      const ctx = canvas.getContext("2d");
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      if (ctx) {
-        requestAnimationFrame(update);
-      }
     }
-  }, []);
+  }, [canvasRef]);
 
   return (
     <div className="relative">
