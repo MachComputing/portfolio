@@ -92,8 +92,10 @@ export default function DiscreteCA() {
         </Button>
         <Button
           onClick={() => {
-            paused.current = false;
-            requestAnimationFrame(update);
+            if (paused.current) {
+              paused.current = false;
+              update();
+            } 
           }}
         >
           Resume simulation
@@ -101,7 +103,7 @@ export default function DiscreteCA() {
         <Button
           onClick={() => {
             cells.current = init();
-            update();
+            if (!paused.current) update();
           }}
         >
           Reset
