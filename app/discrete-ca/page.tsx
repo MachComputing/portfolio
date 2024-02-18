@@ -63,9 +63,10 @@ export default function DiscreteCA() {
       const ctx = canvas.getContext("2d");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      cells = init();
 
       if (ctx) {
-        requestAnimationFrame(update);
+        update();
       }
       window.addEventListener("resize", () => {
         const canvas = canvasRef.current;
