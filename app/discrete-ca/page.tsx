@@ -8,8 +8,8 @@ import Link from "next/link";
 export default function DiscreteCA() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cellWidth = 10;
-  let paused = false;
-  let cells: Cell[][] | null = null;
+  let paused = useRef<boolean>(false);
+  let cells = useRef<Cell[][] | null>(null);
 
   const init = () => {
     const width = canvasRef.current?.width || 0;
@@ -32,27 +32,27 @@ export default function DiscreteCA() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    if (cells == null) {
-      cells = init();
+    if (cells.current === null) {
+      cells.current = init();
       return;
     }
 
     // clone the cells
-    const newCells = cloneDeep(cells);
-    for (let i = 0; i < cells.length; i++) {
-      for (let j = 0; j < cells[i].length; j++) {
-        newCells[i][j].transition(cells);
+    const newCells = cloneDeep(cells.current);
+    for (let i = 0; i < cells.current.length; i++) {
+      for (let j = 0; j < cells.current[i].length; j++) {
+        newCells[i][j].transition(cells.current!);
       }
     }
-    cells = newCells;
+    cells.current = newCells;
 
-    for (let i = 0; i < cells.length; i++) {
-      for (let j = 0; j < cells[i].length; j++) {
-        cells[i][j].render(ctx, cellWidth);
+    for (let i = 0; i < cells.current.length; i++) {
+      for (let j = 0; j < cells.current[i].length; j++) {
+        cells.current[i][j].render(ctx, cellWidth);
       }
     }
 
-    if (!paused) {
+    if (!paused.current) {
       requestAnimationFrame(update);
     }
   };
@@ -63,7 +63,7 @@ export default function DiscreteCA() {
       const ctx = canvas.getContext("2d");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      cells = init();
+      cells.current = init();
 
       if (ctx) {
         update();
@@ -73,7 +73,7 @@ export default function DiscreteCA() {
         if (canvas) {
           canvas.width = window.innerWidth;
           canvas.height = window.innerHeight;
-          cells = init();
+          cells.current = init();
           update();
         }
       });
@@ -87,10 +87,12 @@ export default function DiscreteCA() {
       </div>
       <div className="absolute top-0 right-0 w-60 px-4 py-2 bg-gray-500/20 backdrop-blur-3xl flex flex-col gap-2">
         <h1 className="text-2xl">Controls</h1>
-        <Button onClick={() => (paused = true)}>Pause simulation</Button>
+        <Button onClick={() => (paused.current = true)}>
+          Pause simulation
+        </Button>
         <Button
           onClick={() => {
-            paused = false;
+            paused.current = false;
             requestAnimationFrame(update);
           }}
         >
@@ -98,7 +100,7 @@ export default function DiscreteCA() {
         </Button>
         <Button
           onClick={() => {
-            cells = init();
+            cells.current = init();
             update();
           }}
         >
