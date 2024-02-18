@@ -52,8 +52,9 @@ export default function DiscreteCA() {
       }
     }
 
-    if (paused) return;
-    requestAnimationFrame(update);
+    if (!paused) {
+      requestAnimationFrame(update);
+    }
   };
 
   useEffect(() => {

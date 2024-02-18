@@ -18,7 +18,7 @@ export function GridItem({
   href: string;
 }) {
   return (
-    <div className="min-h-10 min-w-10 bg-white/60 hover:bg-white/70 rounded p-2">
+    <div className="min-h-10 min-w-10 bg-gray-400/60 hover:bg-white/70 rounded p-2">
       <Link href={href}>{children}</Link>
     </div>
   );
