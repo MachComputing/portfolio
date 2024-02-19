@@ -8,16 +8,20 @@ import Link from "next/link";
 export default function DiscreteCA() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cellWidth = 10;
-  let paused = useRef<boolean>(false);
-  let cells = useRef<Cell[][] | null>(null);
+  const initialized = useRef<boolean>(false);
+  const paused = useRef<boolean>(false);
+  const cells = useRef<Cell[][] | null>(null);
 
   const init = () => {
+    canvasRef.current!.width = window.innerWidth;
+    canvasRef.current!.height = window.innerHeight;
+
     const width = canvasRef.current?.width || 0;
     const height = canvasRef.current?.height || 0;
 
     const cols = Math.ceil(width / cellWidth);
     const rows = Math.ceil(height / cellWidth);
-    return Array.from({ length: cols }, (_: unknown, idx1: number) =>
+    cells.current = Array.from({ length: cols }, (_: unknown, idx1: number) =>
       Array.from(
         { length: rows },
         (_: unknown, idx2: number) =>
@@ -33,7 +37,7 @@ export default function DiscreteCA() {
     if (!ctx) return;
 
     if (cells.current === null) {
-      cells.current = init();
+      init();
       return;
     }
 
@@ -58,23 +62,19 @@ export default function DiscreteCA() {
   };
 
   useEffect(() => {
+    if (initialized.current) return;
+
+    initialized.current = true;
     const canvas = canvasRef.current;
     if (canvas) {
-      const ctx = canvas.getContext("2d");
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      cells.current = init();
+      init();
+      update();
 
-      if (ctx) {
-        update();
-      }
       window.addEventListener("resize", () => {
         const canvas = canvasRef.current;
         if (canvas) {
-          canvas.width = window.innerWidth;
-          canvas.height = window.innerHeight;
-          cells.current = init();
-          update();
+          init();
+          if (paused.current) update();
         }
       });
     }
@@ -95,15 +95,15 @@ export default function DiscreteCA() {
             if (paused.current) {
               paused.current = false;
               update();
-            } 
+            }
           }}
         >
           Resume simulation
         </Button>
         <Button
           onClick={() => {
-            cells.current = init();
-            if (!paused.current) update();
+            init();
+            if (paused.current) update();
           }}
         >
           Reset
