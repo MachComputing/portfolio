@@ -7,6 +7,7 @@ import _ from "lodash";
 import { randomLinks } from "@/app/recommendation/pagerank/utils";
 import { PageRankLink } from "@/types";
 import { Button } from "@/components/ui/button";
+import { Matrix, ones, zeros } from "@/lib/math/mat";
 
 declare module "d3" {
   interface SimulationNodeDatum {
@@ -21,6 +22,44 @@ export default function PageRank() {
   const [isDirected, setIsDirected] = useState(true);
   const [nodes, setNodes] = useState<Record<string, any>[]>([]);
   const [links, setLinks] = useState<PageRankLink[]>([]);
+
+  function calculateRankMatrix(
+    nodes: Record<string, any>[],
+    links: PageRankLink[],
+  ): Matrix {
+    const dampingFactor = 0.85;
+    const L = zeros(nodes.length, nodes.length);
+    for (const link of links) {
+      const source = nodes.findIndex((n) => n.id === link.source);
+      const target = nodes.findIndex((n) => n.id === link.target);
+      L.set(target, source, L.get(target, source) + 1);
+    }
+
+    const H = zeros(nodes.length, nodes.length);
+    for (let i = 0; i < nodes.length; i++) {
+      const colSum = L.getColumnSum(i);
+      for (let j = 0; j < nodes.length; j++) {
+        H.set(
+          i,
+          j,
+          colSum != 0 ? L.get(i, j) / colSum : NaN, // Normalize by column sum
+        );
+      }
+    }
+
+    const regularPath = H.mulScalar(dampingFactor);
+    const teleportation = ones(nodes.length, nodes.length).mulScalar(
+      (1 - dampingFactor) / nodes.length,
+    );
+
+    const A = regularPath.add(teleportation);
+    A.replaceNaN(1 / nodes.length);
+    return A;
+  }
+
+  const [rankMatrix, setRankMatrix] = useState<Matrix>(() =>
+    calculateRankMatrix(nodes, links),
+  );
 
   const [data, setData] = useState<{
     nodes: d3.SimulationNodeDatum[];
@@ -52,6 +91,10 @@ export default function PageRank() {
       links: _.cloneDeep(rl),
     });
   }, []);
+
+  useEffect(() => {
+    setRankMatrix(calculateRankMatrix(nodes, links));
+  }, [nodes.length, links]);
 
   useEffect(() => {
     const width = 928;
@@ -87,8 +130,8 @@ export default function PageRank() {
       .attr("markerHeight", 6)
       .attr("orient", "auto");
     marker.append("path").attr("fill", "#999").attr("d", "M0,-5L10,0L0,5");
-    let link: d3.Selection<any, any, any, any>;
 
+    let link: d3.Selection<any, any, any, any>;
     if (isDirected) {
       link = svg
         .append("g")
@@ -211,41 +254,27 @@ export default function PageRank() {
       event.subject.fx = null;
       event.subject.fy = null;
     }
-  }, [data, ref]);
+  }, [data, nodes, links, ref]);
 
   const step = () => {
-    const dampingFactor = 0.85;
-    const newNodes = nodes.map((n) => {
-      const linksTo = links.filter((l) => l.target === n.id);
-      const sum = linksTo.reduce((acc, l) => {
-        const source = nodes.find((nd) => nd.id === l.source);
-        const pjOutbound = links.filter((ln) => ln.source === l.source);
+    const X = zeros(nodes.length, 1);
+    for (let i = 0; i < nodes.length; i++) {
+      X.set(0, i, nodes[i].size);
+    }
+    const newX = rankMatrix.mul(X);
 
-        return acc + (source ? source.size : 0) / pjOutbound.length;
-      }, 0);
-
-      return {
-        ...n,
-        size: (1 - dampingFactor) / nodes.length + dampingFactor * sum,
-      };
-    });
-
-    console.log("newNodes", newNodes);
-
-    setNodes(newNodes);
+    setNodes(nodes.map((n, i) => ({ ...n, size: newX.get(0, i) })));
     setData({
       nodes: _.cloneDeep(
-        newNodes.map((n) => ({
-          ...n,
-          size: n.size * 30 + 20,
-        })),
+        nodes.map((n, i) => ({ ...n, size: newX.get(0, i) * 30 + 20 })),
       ) as d3.SimulationNodeDatum[],
       links: _.cloneDeep(links),
     });
   };
 
-  const reset = () => {
-    console.log("reset");
+  const reset = (
+    newLinks: { source: string; target: string; value: number }[],
+  ) => {
     setNodes(nodes.map((n) => ({ ...n, size: 1 / nodes.length })));
     setData({
       nodes: _.cloneDeep(
@@ -254,7 +283,7 @@ export default function PageRank() {
           size: (1 / nodes.length) * 30 + 20,
         })),
       ) as d3.SimulationNodeDatum[],
-      links: _.cloneDeep(links),
+      links: _.cloneDeep(newLinks),
     });
   };
 
@@ -266,12 +295,8 @@ export default function PageRank() {
         <AdjacencyTable
           data={{ nodes: nodes as d3.SimulationNodeDatum[], links }}
           setData={(newData) => {
-            setData(_.cloneDeep(newData));
-            setNodes(
-              newData.nodes.map((n) => ({ ...n, size: (n.size - 20) / 30 })),
-            );
             setLinks(newData.links);
-            reset();
+            reset(newData.links);
           }}
           isDirected={isDirected}
         />

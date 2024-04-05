@@ -9,7 +9,6 @@ export function randomLinks(
   count: number,
   nodes: d3.SimulationNodeDatum[],
 ): PageRankLink[] {
-  console.log("RandomLink", count);
   const nodeIds = nodes.map((node) => node.id);
   const links: PageRankLink[] = [];
   for (let i = 0; i < count; i++) {
