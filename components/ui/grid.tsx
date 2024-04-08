@@ -18,14 +18,14 @@ export function GridItem({
   href: string;
 }) {
   return (
-    <div className="min-h-10 min-w-10 bg-gray-300/45 hover:bg-gray-400/40 rounded p-2">
+    <div className="min-h-10 min-w-10 bg-gray-300/45 hover:bg-gray-400/40 rounded-xl p-2">
       <Link href={href}>{children}</Link>
     </div>
   );
 }
 
 export function GridItemHeader({ children }: { children: React.ReactNode }) {
-  return <h1 className="text-xl font-bold text-center">{children}</h1>;
+  return <h1 className="text-2xl font-bold my-4 text-amber-950">{children}</h1>;
 }
 
 export function GridItemDescription({
