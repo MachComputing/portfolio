@@ -8,6 +8,7 @@ import { calculateRankMatrix, randomLinks } from "./utils";
 import { PageRankLink } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Matrix, zeros } from "@/lib/math/mat";
+import Link from "next/link";
 
 declare module "d3" {
   interface SimulationNodeDatum {
@@ -61,8 +62,8 @@ export default function PageRank() {
   }, [nodes.length, links]);
 
   useEffect(() => {
-    const width = 928;
-    const height = 600;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
     const simulation = d3
       .forceSimulation(data.nodes)
@@ -253,6 +254,14 @@ export default function PageRank() {
 
   return (
     <>
+      <div className="relative">
+        <Link href="/">
+          <div className="absolute top-0 left-0 px-4 py-2 bg-gray-500/20 hover:bg-gray-700/30 backdrop-blur-3xl">
+            Main Page
+          </div>
+        </Link>
+      </div>
+
       <div className="absolute top-0 right-0">
         <Button onClick={() => step()}>Step</Button>
 
