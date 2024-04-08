@@ -39,7 +39,13 @@ export function GridItemDescription({
 export function GridItemImage({ href, alt }: { href: string; alt: string }) {
   return (
     <div className="relative w-full h-32 overflow-hidden">
-      <Image src={href} alt={alt} width={1024} height={1024} />
+      <Image
+        src={href}
+        alt={alt}
+        width={1024}
+        height={1024}
+        className="-translate-y-1/2"
+      />
     </div>
   );
 }

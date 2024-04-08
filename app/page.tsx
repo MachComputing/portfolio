@@ -29,6 +29,27 @@ export default function Home() {
             </p>
           </GridItemDescription>
         </GridItem>
+        <GridItem href="/recommendation/pagerank">
+          <GridItemHeader>Google Page Rank</GridItemHeader>
+          <GridItemImage
+            href="/RecommendationPageRank.png"
+            alt="Project picture"
+          />
+          <GridItemDescription>
+            <p>
+              Page Rank is an algorithm used by Google Search to rank websites.
+            </p>
+            <p>
+              It works by counting the references from and to a website. It then
+              calculates the importance of a website based on the importance of
+              the websites that reference it.
+            </p>
+            <p>
+              This project is a simple implementation of the Page Rank
+              algorithm.
+            </p>
+          </GridItemDescription>
+        </GridItem>
       </Grid>
     </main>
   );

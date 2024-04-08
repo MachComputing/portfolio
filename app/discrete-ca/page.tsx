@@ -82,9 +82,11 @@ export default function DiscreteCA() {
 
   return (
     <div className="relative">
-      <div className="absolute top-0 left-0 px-4 py-2 bg-gray-500/20 backdrop-blur-3xl">
-        <Link href="/">Main Page</Link>
-      </div>
+      <Link href="/">
+        <div className="absolute top-0 left-0 px-4 py-2 bg-gray-500/20 hover:bg-gray-700/30 backdrop-blur-3xl">
+          Main Page
+        </div>
+      </Link>
       <div className="absolute top-0 right-0 w-60 px-4 py-2 bg-gray-500/20 backdrop-blur-3xl flex flex-col gap-2">
         <h1 className="text-2xl">Controls</h1>
         <Button onClick={() => (paused.current = true)}>
