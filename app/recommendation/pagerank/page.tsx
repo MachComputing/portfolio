@@ -4,10 +4,10 @@ import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { AdjacencyTable } from "@/components/ui/adjacencytable";
 import _ from "lodash";
-import { randomLinks } from "@/app/recommendation/pagerank/utils";
+import { calculateRankMatrix, randomLinks } from "./utils";
 import { PageRankLink } from "@/types";
 import { Button } from "@/components/ui/button";
-import { Matrix, ones, zeros } from "@/lib/math/mat";
+import { Matrix, zeros } from "@/lib/math/mat";
 
 declare module "d3" {
   interface SimulationNodeDatum {
@@ -22,45 +22,9 @@ export default function PageRank() {
   const [isDirected, setIsDirected] = useState(true);
   const [nodes, setNodes] = useState<Record<string, any>[]>([]);
   const [links, setLinks] = useState<PageRankLink[]>([]);
-
-  function calculateRankMatrix(
-    nodes: Record<string, any>[],
-    links: PageRankLink[],
-  ): Matrix {
-    const dampingFactor = 0.85;
-    const L = zeros(nodes.length, nodes.length);
-    for (const link of links) {
-      const source = nodes.findIndex((n) => n.id === link.source);
-      const target = nodes.findIndex((n) => n.id === link.target);
-      L.set(target, source, L.get(target, source) + 1);
-    }
-
-    const H = zeros(nodes.length, nodes.length);
-    for (let i = 0; i < nodes.length; i++) {
-      const colSum = L.getColumnSum(i);
-      for (let j = 0; j < nodes.length; j++) {
-        H.set(
-          i,
-          j,
-          colSum != 0 ? L.get(i, j) / colSum : NaN, // Normalize by column sum
-        );
-      }
-    }
-
-    const regularPath = H.mulScalar(dampingFactor);
-    const teleportation = ones(nodes.length, nodes.length).mulScalar(
-      (1 - dampingFactor) / nodes.length,
-    );
-
-    const A = regularPath.add(teleportation);
-    A.replaceNaN(1 / nodes.length);
-    return A;
-  }
-
   const [rankMatrix, setRankMatrix] = useState<Matrix>(() =>
     calculateRankMatrix(nodes, links),
   );
-
   const [data, setData] = useState<{
     nodes: d3.SimulationNodeDatum[];
     links: PageRankLink[];
@@ -254,7 +218,7 @@ export default function PageRank() {
       event.subject.fx = null;
       event.subject.fy = null;
     }
-  }, [data, nodes, links, ref]);
+  }, [data, nodes, links]);
 
   const step = () => {
     const X = zeros(nodes.length, 1);
