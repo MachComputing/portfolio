@@ -2,6 +2,7 @@
 
 ## Projects
 - [ ] Wave Function Collapse
-- [ ] PageRank Algorithm
-- [X] Discrete Cellular Automata
+- [X] PageRank Algorithm
+- [X] Discrete Cellular Automata (Conway's Game of Life)
+- [ ] Perceptron Algorithm Visualizer
 - [ ] Smooth-Life Cellular Automata
